@@ -9,22 +9,25 @@ const numCPU = os.cpus().length
 app.use('/', (req , res) => {
     
     const response = isPrime(req.query.number);
-    
-    
+
     res.json({
         message : response,
         From: process.pid
     })
-    // process.exit()
+    
+    process.kill(process.pid)
 })
 
+// console.log(cluster,"ccccccccccc")
+
 if( cluster.isMaster ){
+
     for(let i = 0; i < numCPU; i++){
         cluster.fork()
     }
     
     cluster.on('exit', (worker, error, signal) => {
-        console.log(`Worker ${ worker.process.id } died`);
+        console.log(`Worker ${worker.process.pid} died`);
         cluster.fork()
     })
 
